@@ -1,8 +1,15 @@
 {
 	"welcomeFile": "webapp/index.html",
 	"authenticationMethod": "none",
-	"routes": [{
-		"source": "^/DroneParts.xsodata/.*$",
-		"destination": "js_be"
-	}]
+	"routes": [
+		{
+			"source": "^/DroneParts.xsodata/(.*)$",
+			"destination": "js_be"
+		},
+		{
+			"source": "^/webapp/(.*)$",
+			"target": "$1",
+			"localDir": "resources/webapp"
+		}
+	]
 }

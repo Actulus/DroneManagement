@@ -1,28 +1,84 @@
-<mvc:View controllerName="app.app.controller.ImportParts" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" displayBlock="true">
+<mvc:View
+	controllerName="app.app.controller.ImportParts"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:u="sap.ui.unified"
+	displayBlock="true"
+>
 	<Page title="Import Drone Parts">
 		<content>
-			<SearchField liveChange="onSearch"/>
 			<Table id="partsTable" items="{/DroneParts}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<SearchField
+							width="40%"
+							placeholder="Search by Name, Category, or Manufacturer"
+							search="onSearch"
+							showSearchButton="true"
+						/>
+						<ToolbarSpacer />
+						<Button
+							icon="sap-icon://add"
+							tooltip="Add Part"
+							press="onAdd"
+						/>
+						<u:FileUploader
+							id="fileUploader"
+							name="myUploader"
+							fileType="csv"
+							buttonOnly="true"
+							icon="sap-icon://upload"
+							tooltip="Upload from CSV"
+							change="onFileChange"
+							class="sapUiTinyMarginBegin"
+						/>
+						<Button
+							icon="sap-icon://download"
+							tooltip="Export to CSV"
+							press="onExportToCSV"
+						/>
+					</OverflowToolbar>
+				</headerToolbar>
 				<columns>
-					<Column><Text text="Name"/></Column>
-					<Column><Text text="Category"/></Column>
-					<Column><Text text="Manufacturer"/></Column>
-					<Column><Text text="Price"/></Column>
-					<Column><Text text="Stock"/></Column>
+					<Column><Text text="Name" /></Column>
+					<Column><Text text="Category" /></Column>
+					<Column><Text text="Manufacturer" /></Column>
+					<Column hAlign="End"><Text text="Price" /></Column>
+					<Column hAlign="End"><Text text="Stock" /></Column>
+					<Column hAlign="Center" width="8rem"><Text text="Actions" /></Column>
 				</columns>
 				<items>
-					<ColumnListItem>
+					<ColumnListItem vAlign="Middle">
 						<cells>
-							<Text text="{Name}"/>
-							<Text text="{Category}"/>
-							<Text text="{Manufacturer}"/>
-							<Text text="{Price}"/>
-							<Text text="{Stock}"/>
+							<Text text="{Name}" />
+							<Text text="{Category}" />
+							<Text text="{Manufacturer}" />
+							<ObjectNumber
+								number="{
+									path: 'Price',
+									type: 'sap.ui.model.type.Float',
+									formatOptions: { minFractionDigits: 2, maxFractionDigits: 2 }
+								}"
+								unit="USD"
+							/>
+							<ObjectNumber number="{Stock}" />
+							<HBox justifyContent="Center" alignItems="Center">
+								<Button
+									icon="sap-icon://edit"
+									type="Transparent"
+									class="sapUiTinyMarginEnd"
+									press="onEdit"
+								/>
+								<Button
+									icon="sap-icon://delete"
+									type="Transparent"
+									press="onDelete"
+								/>
+							</HBox>
 						</cells>
 					</ColumnListItem>
 				</items>
 			</Table>
-			<Button text="Go to Export" press="onGoToExport"/>
 		</content>
 	</Page>
 </mvc:View>
