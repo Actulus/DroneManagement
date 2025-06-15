@@ -1,3 +1,34 @@
 ID: DroneManagement
 _schema-version: '2.1'
 version: 0.0.1
+modules:
+  - name: db
+    type: hdb
+    path: db
+    requires:
+      - name: hdi_db
+  - name: odata
+    type: nodejs
+    path: odata
+    provides:
+      - name: odata_api
+        properties:
+          url: '${default-url}'
+    requires:
+      - name: db
+      - name: hdi_db
+  - name: app
+    type: html5
+    path: app
+    requires:
+      - name: odata_api
+        group: destinations
+        properties:
+          name: js_be
+          url: '~{url}'
+          forwardAuthToken: true
+resources:
+  - name: hdi_db
+    properties:
+      hdi-container-name: '${service-name}'
+    type: com.sap.xs.hdi-container

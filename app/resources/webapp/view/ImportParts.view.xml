@@ -1,0 +1,28 @@
+<mvc:View controllerName="app.app.controller.ImportParts" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" displayBlock="true">
+	<Page title="Import Drone Parts">
+		<content>
+			<SearchField liveChange="onSearch"/>
+			<Table id="partsTable" items="{/DroneParts}">
+				<columns>
+					<Column><Text text="Name"/></Column>
+					<Column><Text text="Category"/></Column>
+					<Column><Text text="Manufacturer"/></Column>
+					<Column><Text text="Price"/></Column>
+					<Column><Text text="Stock"/></Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{Name}"/>
+							<Text text="{Category}"/>
+							<Text text="{Manufacturer}"/>
+							<Text text="{Price}"/>
+							<Text text="{Stock}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+			<Button text="Go to Export" press="onGoToExport"/>
+		</content>
+	</Page>
+</mvc:View>

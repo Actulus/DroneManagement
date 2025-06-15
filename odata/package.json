@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "@sap/xsenv": "^3",
+    "@sap/xsjs": "^6"
+  },
+  "description": "my description",
+  "devDependencies": {
+    "@sap/xsjs-test": "^3"
+  },
+  "files": [],
+  "main": "server.js",
+  "name": "odata",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node testrun.js"
+  },
+  "engines": {
+    "node": "14.x"
+  },
+  "version": "1.0.0"
+}

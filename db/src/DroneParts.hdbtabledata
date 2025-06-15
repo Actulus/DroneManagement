@@ -1,0 +1,30 @@
+{
+	"format_version": 1,
+	"imports": [{
+		"target_table": "DroneManagement.db::DroneParts",
+		"source_data": {
+			"data_type": "CSV",
+			"file_name": "DroneManagement.db::DroneParts.csv",
+			"has_header": false,
+			"type_config": {
+				"delimiter": ","
+			}
+		},
+		"import_settings": {
+			"import_columns": [
+				"Name",
+				"Category",
+				"Manufacturer",
+				"Price",
+				"Stock"
+			]
+		},
+		"column_mappings": {
+			"Name": 1,
+			"Category": 2,
+			"Manufacturer": 3,
+			"Price": 4,
+			"Stock": 5
+		}
+	}]
+}

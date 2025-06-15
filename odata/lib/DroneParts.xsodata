@@ -1,0 +1,3 @@
+service {
+  "DroneManagement.db::DroneParts" as "DroneParts";
+}

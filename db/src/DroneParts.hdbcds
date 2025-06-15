@@ -1,0 +1,13 @@
+namespace DroneManagement.db;
+
+entity DroneParts {
+    key ID           : Integer generated always as identity(start with 1 increment by 1);
+        Name         : String(100);
+        Category     : String(50);
+        Manufacturer : String(100);
+        Price        : Decimal(10, 2);
+        Stock        : Integer;
+}
+technical configuration {
+    column store;
+};
