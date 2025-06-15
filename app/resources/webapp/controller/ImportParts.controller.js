@@ -107,11 +107,17 @@ sap.ui.define(
 
 			onSaveDialog: function () {
 			  const oModel = this.getView().getModel();
-			  const oPartData = this.getView().getModel("part").getData();
+			  const oRawData = this.getView().getModel("part").getData();
 			  const bIsEdit = this.getView().getModel("editMode").getProperty("/isEdit");
 			
-			  delete oPartData.__metadata;
-			  delete oPartData.ID;
+			  // Create a clean payload without __metadata or ID
+			  const oNewPart = {
+			    Name: oRawData.Name,
+			    Category: oRawData.Category,
+			    Manufacturer: oRawData.Manufacturer,
+			    Price: oRawData.Price,
+			    Stock: oRawData.Stock
+			  };
 			
 			  const mParameters = {
 			    success: () => {
@@ -123,17 +129,14 @@ sap.ui.define(
 			        ? JSON.parse(oError.responseText)?.error?.message?.value
 			        : "Unknown error";
 			      MessageBox.error("Error: " + sMessage);
-			    },
+			    }
 			  };
 			
 			  if (bIsEdit) {
-			  	console.log(this._sEditPath);
-			  	console.log(oPartData);
-			  	console.log(mParameters);
-			    oModel.update(this._sEditPath, oPartData, mParameters);
+			    oModel.update(this._sEditPath, oNewPart, mParameters);
 			  } else {
-			  	console.log("CREATE payload:", JSON.stringify(oPartData, null, 2));
-			    oModel.create("/DroneParts", oPartData, mParameters);
+			    console.log("CREATE payload:", JSON.stringify(oNewPart, null, 2));
+			    oModel.create("/DroneParts", oNewPart, mParameters);
 			  }
 			},
 
