@@ -1,0 +1,95 @@
+<mvc:View
+	controllerName="app.app.controller.ExportDrones"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:u="sap.ui.unified"
+	displayBlock="true"
+>
+	<Page title="Export Drones">
+		<content>
+			<Table id="dronesTable" items="{/Drones}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<SearchField
+							width="40%"
+							placeholder="Search by Model, Serial Number, or Customer"
+							search="onSearch"
+							showSearchButton="true"
+						/>
+						<ToolbarSpacer />
+						<Button
+							icon="sap-icon://add"
+							tooltip="Add Drone"
+							press="onAdd"
+						/>
+						<Button
+							icon="sap-icon://shipping-status"
+							tooltip="Mark as Exported"
+							press="onMarkExported"
+							enabled="{= ${dronesTable>/selectedItems}.length > 0}"
+						/>
+						<Button
+							icon="sap-icon://download"
+							tooltip="Export to CSV"
+							press="onExportToCSV"
+						/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column><Text text="Model" /></Column>
+					<Column><Text text="Serial Number" /></Column>
+					<Column><Text text="Status" /></Column>
+					<Column><Text text="Assembly Date" /></Column>
+					<Column><Text text="Export Date" /></Column>
+					<Column hAlign="End"><Text text="Price" /></Column>
+					<Column><Text text="Customer" /></Column>
+					<Column hAlign="Center" width="8rem"><Text text="Actions" /></Column>
+				</columns>
+				<items>
+					<ColumnListItem vAlign="Middle" selected="{selected}">
+						<cells>
+							<Text text="{Model}" />
+							<Text text="{SerialNumber}" />
+							<ObjectStatus 
+								text="{Status}" 
+								state="{path: 'Status', formatter: '.formatStatusState'}"
+							/>
+							<Text text="{
+								path: 'AssemblyDate',
+								type: 'sap.ui.model.type.Date',
+								formatOptions: { style: 'medium' }
+							}" />
+							<Text text="{
+								path: 'ExportDate',
+								type: 'sap.ui.model.type.Date',
+								formatOptions: { style: 'medium' }
+							}" />
+							<ObjectNumber
+								number="{
+									path: 'Price',
+									type: 'sap.ui.model.type.Float',
+									formatOptions: { minFractionDigits: 2, maxFractionDigits: 2 }
+								}"
+								unit="USD"
+							/>
+							<Text text="{Customer}" />
+							<HBox justifyContent="Center" alignItems="Center">
+								<Button
+									icon="sap-icon://edit"
+									type="Transparent"
+									class="sapUiTinyMarginEnd"
+									press="onEdit"
+								/>
+								<Button
+									icon="sap-icon://delete"
+									type="Transparent"
+									press="onDelete"
+								/>
+							</HBox>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Page>
+</mvc:View>

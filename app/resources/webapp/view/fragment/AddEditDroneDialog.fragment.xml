@@ -1,0 +1,74 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+>
+	<Dialog
+		id="addEditDialog"
+		title="{= ${editMode>/isEdit} ? 'Edit Drone' : 'Add New Drone' }"
+	>
+		<content>
+			<f:SimpleForm editable="true" layout="ResponsiveGridLayout">
+				<Label text="Model" required="true" />
+				<Input
+					value="{drone>/Model}"
+					required="true"
+					liveChange="onDialogInputChange"
+				/>
+				<Label text="Serial Number" required="true" />
+				<Input
+					value="{drone>/SerialNumber}"
+					required="true"
+					liveChange="onDialogInputChange"
+				/>
+				<Label text="Status" required="true" />
+				<Select
+					selectedKey="{drone>/Status}"
+					change="onDialogInputChange"
+				>
+					<items>
+						<core:Item key="In Progress" text="In Progress" />
+						<core:Item key="Ready" text="Ready" />
+						<core:Item key="Exported" text="Exported" />
+					</items>
+				</Select>
+				<Label text="Assembly Date" />
+				<DatePicker value="{drone>/AssemblyDate}" />
+				<Label text="Export Date" />
+				<DatePicker value="{drone>/ExportDate}" />
+				<Label text="Price" required="true" />
+				<Input
+					value="{
+						path: 'drone>/Price',
+						type: 'sap.ui.model.type.Float',
+						formatOptions: {
+							minFractionDigits: 2,
+							maxFractionDigits: 2
+						}
+					}"
+					required="true"
+					liveChange="onDialogInputChange"
+				/>
+				<Label text="Customer" />
+				<Input value="{drone>/Customer}" />
+				<Label text="Notes" />
+				<TextArea
+					value="{drone>/Notes}"
+					rows="3"
+				/>
+			</f:SimpleForm>
+		</content>
+		<beginButton>
+			<Button
+				id="dialogSaveButton"
+				text="Save"
+				type="Emphasized"
+				press="onSaveDialog"
+				enabled="false"
+			/>
+		</beginButton>
+		<endButton>
+			<Button text="Cancel" press="onCancelDialog" />
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

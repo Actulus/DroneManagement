@@ -102,14 +102,24 @@
 				"controlAggregation": "pages",
 				"controlId": "app"
 			},
-			"routes": [{
-				"pattern": "",
-				"name": "ImportParts",
-				"target": "ImportParts"
-			}],
+			"routes": [
+				{
+					"pattern": "",
+					"name": "ImportParts",
+					"target": "ImportParts"
+				},
+				{
+					"pattern": "export-drones",
+					"name": "ExportDrones", 
+					"target": "ExportDrones"
+				}
+			],
 			"targets": {
 				"ImportParts": {
 					"viewName": "ImportParts"
+				},
+				"ExportDrones": {
+					"viewName": "ExportDrones"
 				}
 			}
 		}

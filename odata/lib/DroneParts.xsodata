@@ -1,3 +1,4 @@
 service {
   "DroneManagement.db::DroneParts" as "DroneParts";
+  "DroneManagement.db::Drones" as "Drones";
 }

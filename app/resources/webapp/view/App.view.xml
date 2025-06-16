@@ -3,6 +3,21 @@
 		<App id="app">
 			<pages>
 				<Page id="page" title="{i18n>title}">
+					<customHeader>
+						<Bar>
+							<contentLeft>
+								<Title text="{i18n>title}" />
+							</contentLeft>
+							<contentRight>
+								<SegmentedButton selectedKey="{nav>/selectedKey}">
+									<items>
+										<SegmentedButtonItem key="parts" text="Import Parts" press="onNavigateToImportParts" />
+										<SegmentedButtonItem key="drones" text="Export Drones" press="onNavigateToExportDrones" />
+									</items>
+								</SegmentedButton>
+							</contentRight>
+						</Bar>
+					</customHeader>
 					<content></content>
 				</Page>
 			</pages>
