@@ -1,0 +1,35 @@
+{
+	"format_version": 1,
+	"imports": [{
+		"target_table": "DroneManagement.db::Drones",
+		"source_data": {
+			"data_type": "CSV",
+			"file_name": "DroneManagement.db::Drones.csv",
+			"has_header": false,
+			"type_config": {
+				"delimiter": ","
+			}
+		},
+		"import_settings": {
+			"import_columns": [
+				"ID",
+				"Model",
+				"SerialNumber",
+				"Status",
+				"Price",
+				"Customer",
+				"Notes"
+			],
+			"include_filter": []
+		},
+		"column_mappings": {
+			"ID": 1,
+			"Model": 2,
+			"SerialNumber": 3,
+			"Status": 4,
+			"Price": 5,
+			"Customer": 6,
+			"Notes": 7
+		}
+	}]
+}

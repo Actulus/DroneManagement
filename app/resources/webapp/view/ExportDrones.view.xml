@@ -1,43 +1,38 @@
 <mvc:View
-	controllerName="app.app.controller.ImportParts"
+	controllerName="app.app.controller.ExportDrones"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:u="sap.ui.unified"
 	displayBlock="true"
 >
-	<Page title="Import Drone Parts">
+	<Page title="Export Drones">
 		<content>
-			<Table id="partsTable" items="{/DroneParts}">
+			<Table id="dronesTable" items="{/Drones}" mode="MultiSelect">
 				<headerToolbar>
 					<OverflowToolbar>
 						<SearchField
 							width="40%"
-							placeholder="Search by Name, Category, or Manufacturer"
+							placeholder="Search by Model, Serial Number, or Customer"
 							search="onSearch"
 							showSearchButton="true"
 						/>
 						<ToolbarSpacer />
 						<Button
-							text="Go to Export Drones"
-							icon="sap-icon://navigation-right-arrow"
+							text="Go to Import Parts"
+							icon="sap-icon://navigation-left-arrow"
 							type="Emphasized"
-							press="onNavigateToExportDrones"
+							press="onNavigateToImportParts"
 							class="sapUiTinyMarginEnd"
 						/>
 						<Button
 							icon="sap-icon://add"
-							tooltip="Add Part"
+							tooltip="Add Drone"
 							press="onAdd"
 						/>
-						<u:FileUploader
-							id="fileUploader"
-							name="myUploader"
-							fileType="csv"
-							buttonOnly="true"
-							icon="sap-icon://upload"
-							tooltip="Upload from CSV"
-							change="onFileChange"
-							class="sapUiTinyMarginBegin"
+						<Button
+							icon="sap-icon://shipping-status"
+							tooltip="Mark as Exported"
+							press="onMarkExported"
+							enabled="{= ${dronesTable>/hasSelection}}"
 						/>
 						<Button
 							icon="sap-icon://download"
@@ -47,19 +42,22 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column><Text text="Name" /></Column>
-					<Column><Text text="Category" /></Column>
-					<Column><Text text="Manufacturer" /></Column>
+					<Column><Text text="Model" /></Column>
+					<Column><Text text="Serial Number" /></Column>
+					<Column><Text text="Status" /></Column>
 					<Column hAlign="End"><Text text="Price" /></Column>
-					<Column hAlign="End"><Text text="Stock" /></Column>
+					<Column><Text text="Customer" /></Column>
 					<Column hAlign="Center" width="8rem"><Text text="Actions" /></Column>
 				</columns>
 				<items>
 					<ColumnListItem vAlign="Middle">
 						<cells>
-							<Text text="{Name}" />
-							<Text text="{Category}" />
-							<Text text="{Manufacturer}" />
+							<Text text="{Model}" />
+							<Text text="{SerialNumber}" />
+							<ObjectStatus 
+								text="{Status}" 
+								state="{path: 'Status', formatter: '.formatStatusState'}"
+							/>
 							<ObjectNumber
 								number="{
 									path: 'Price',
@@ -68,7 +66,7 @@
 								}"
 								unit="USD"
 							/>
-							<ObjectNumber number="{Stock}" />
+							<Text text="{Customer}" />
 							<HBox justifyContent="Center" alignItems="Center">
 								<Button
 									icon="sap-icon://edit"

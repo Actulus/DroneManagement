@@ -231,6 +231,10 @@ sap.ui.define(
 				oLink.setAttribute("download", "DroneParts.csv");
 				oLink.click();
 			},
+			
+			onNavigateToExportDrones: function() {
+				this.getOwnerComponent().getRouter().navTo("ExportDrones");
+			}
 		});
 	}
 );
