@@ -22,12 +22,12 @@
 			]
 		},
 		"column_mappings": {
-			"ID": 0,
-			"Name": 1,
-			"Category": 2,
-			"Manufacturer": 3,
-			"Price": 4,
-			"Stock": 5
+			"ID": 1,
+			"Name": 2,
+			"Category": 3,
+			"Manufacturer": 4,
+			"Price": 5,
+			"Stock": 6
 		}
 	}]
 }

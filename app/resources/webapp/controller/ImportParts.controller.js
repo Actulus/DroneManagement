@@ -167,63 +167,64 @@ sap.ui.define(
 			},
 			
 			_processCSV: function (sCsvData) {
-				const oModel = this.getView().getModel();
-				const aLines = sCsvData.split(/\r\n|\n/);
-				let iSuccessCount = 0;
-
-				// Use batch processing
-				aLines.forEach((sLine, index) => {
-					// Skip empty lines and the header row
-					if (sLine.trim() === "" || index === 0) {
-						return;
-					}
-
-					const aValues = sLine.split(",");
-					if (aValues.length === 5) {
-						// Clean each value: trim whitespace and remove all quotes
-						const aCleanValues = aValues.map((value) =>
-							value.trim().replace(/"/g, "")
-						);
-
-						const oNewPart = {
-							ID: this.generateUUID(), // Add UUID for each imported part
-							Name: aCleanValues[0],
-							Category: aCleanValues[1],
-							Manufacturer: aCleanValues[2],
-							Price: parseFloat(aCleanValues[3]),
-							Stock: parseInt(aCleanValues[4], 10),
-						};
-
-						// Check for valid data before adding to batch
-						if (
-							oNewPart.Name &&
-							!isNaN(oNewPart.Price) &&
-							!isNaN(oNewPart.Stock)
-						) {
-							oModel.createEntry("/DroneParts", { properties: oNewPart });
-							iSuccessCount++;
-						}
-					}
-				});
-
-				if (iSuccessCount > 0) {
-					oModel.submitChanges({
-						success: () => {
-							MessageToast.show(
-								`${iSuccessCount} parts imported successfully.`
-							);
-							oModel.refresh();
-						},
-						error: (oError) => {
-							MessageBox.error(
-								"Error during import: " + JSON.stringify(oError)
-							);
-							oModel.resetChanges(); // Clear pending changes on error
-						},
-					});
-				} else {
-					MessageBox.warning("No valid data found in the CSV file to import.");
-				}
+			    const oModel = this.getView().getModel();
+			    const aLines = sCsvData.split(/\r\n|\n/);
+			    let iSuccessCount = 0;
+			
+			    // Use batch processing
+			    aLines.forEach((sLine, index) => {
+			        // Skip empty lines only (no header to skip)
+			        if (sLine.trim() === "") {
+			            return;
+			        }
+			
+			        const aValues = sLine.split(",");
+			        if (aValues.length === 6) { // Changed from 5 to 6
+			            // Clean each value: trim whitespace and remove all quotes
+			            const aCleanValues = aValues.map((value) =>
+			                value.trim().replace(/"/g, "")
+			            );
+			
+			            const oNewPart = {
+			                ID: aCleanValues[0],           // Use ID from CSV
+			                Name: aCleanValues[1],         // Fixed: was aCleanValues[0]
+			                Category: aCleanValues[2],     // Fixed: was aCleanValues[1]
+			                Manufacturer: aCleanValues[3], // Fixed: was aCleanValues[2]
+			                Price: parseFloat(aCleanValues[4]), // Fixed: was aCleanValues[3]
+			                Stock: parseInt(aCleanValues[5], 10), // Fixed: was aCleanValues[4]
+			            };
+			
+			            // Check for valid data before adding to batch
+			            if (
+			                oNewPart.ID &&             // Added ID validation
+			                oNewPart.Name &&
+			                !isNaN(oNewPart.Price) &&
+			                !isNaN(oNewPart.Stock)
+			            ) {
+			                oModel.createEntry("/DroneParts", { properties: oNewPart });
+			                iSuccessCount++;
+			            }
+			        }
+			    });
+			
+			    if (iSuccessCount > 0) {
+			        oModel.submitChanges({
+			            success: () => {
+			                MessageToast.show(
+			                    `${iSuccessCount} parts imported successfully.`
+			                );
+			                oModel.refresh();
+			            },
+			            error: (oError) => {
+			                MessageBox.error(
+			                    "Error during import: " + JSON.stringify(oError)
+			                );
+			                oModel.resetChanges(); // Clear pending changes on error
+			            },
+			        });
+			    } else {
+			        MessageBox.warning("No valid data found in the CSV file to import.");
+			    }
 			},
 
 			onExportToCSV: function () {
