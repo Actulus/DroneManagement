@@ -1,7 +1,7 @@
 namespace DroneManagement.db;
 
-entity DroneParts {
-    key ID           : Integer generated always as identity(start with 1 increment by 1);
+entity DroneParts{
+    key ID           : String(36);
         Name         : String(100);
         Category     : String(50);
         Manufacturer : String(100);

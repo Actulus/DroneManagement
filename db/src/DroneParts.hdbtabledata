@@ -7,11 +7,13 @@
 			"file_name": "DroneManagement.db::DroneParts.csv",
 			"has_header": false,
 			"type_config": {
-				"delimiter": ","
+				"delimiter": ",",
+				"decimal_separator": "."
 			}
 		},
 		"import_settings": {
 			"import_columns": [
+				"ID",
 				"Name",
 				"Category",
 				"Manufacturer",
@@ -20,6 +22,7 @@
 			]
 		},
 		"column_mappings": {
+			"ID": 0,
 			"Name": 1,
 			"Category": 2,
 			"Manufacturer": 3,

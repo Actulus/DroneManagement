@@ -28,6 +28,15 @@ sap.ui.define(
 				this.getView().setModel(new JSONModel({}), "part");
 			},
 
+			// Generate UUID v4
+			generateUUID: function() {
+				return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+					var r = Math.random() * 16 | 0,
+						v = c == 'x' ? r : (r & 0x3 | 0x8);
+					return v.toString(16);
+				});
+			},
+
 			onSearch: function (oEvent) {
 				const sQuery = oEvent.getParameter("query");
 				const oTable = this.byId("partsTable");
@@ -106,38 +115,43 @@ sap.ui.define(
 			},
 
 			onSaveDialog: function () {
-			  const oModel = this.getView().getModel();
-			  const oRawData = this.getView().getModel("part").getData();
-			  const bIsEdit = this.getView().getModel("editMode").getProperty("/isEdit");
-			
-			  // Create a clean payload without __metadata or ID
-			  const oNewPart = {
-			    Name: oRawData.Name,
-			    Category: oRawData.Category,
-			    Manufacturer: oRawData.Manufacturer,
-			    Price: oRawData.Price,
-			    Stock: oRawData.Stock
-			  };
-			
-			  const mParameters = {
-			    success: () => {
-			      MessageToast.show(bIsEdit ? "Part updated." : "Part created.");
-			      this.onCancelDialog();
-			    },
-			    error: (oError) => {
-			      const sMessage = oError?.responseText
-			        ? JSON.parse(oError.responseText)?.error?.message?.value
-			        : "Unknown error";
-			      MessageBox.error("Error: " + sMessage);
-			    }
-			  };
-			
-			  if (bIsEdit) {
-			    oModel.update(this._sEditPath, oNewPart, mParameters);
-			  } else {
-			    console.log("CREATE payload:", JSON.stringify(oNewPart, null, 2));
-			    oModel.create("/DroneParts", oNewPart, mParameters);
-			  }
+				const oModel = this.getView().getModel();
+				const oRawData = this.getView().getModel("part").getData();
+				const bIsEdit = this.getView().getModel("editMode").getProperty("/isEdit");
+
+				// Create a clean payload
+				const oNewPart = {
+					Name: oRawData.Name,
+					Category: oRawData.Category,
+					Manufacturer: oRawData.Manufacturer,
+					Price: oRawData.Price,
+					Stock: oRawData.Stock
+				};
+
+				// Add UUID for new parts
+				if (!bIsEdit) {
+					oNewPart.ID = this.generateUUID();
+				}
+
+				const mParameters = {
+					success: () => {
+						MessageToast.show(bIsEdit ? "Part updated." : "Part created.");
+						this.onCancelDialog();
+					},
+					error: (oError) => {
+						const sMessage = oError?.responseText
+							? JSON.parse(oError.responseText)?.error?.message?.value
+							: "Unknown error";
+						MessageBox.error("Error: " + sMessage);
+					}
+				};
+
+				if (bIsEdit) {
+					oModel.update(this._sEditPath, oNewPart, mParameters);
+				} else {
+					console.log("CREATE payload:", JSON.stringify(oNewPart, null, 2));
+					oModel.create("/DroneParts", oNewPart, mParameters);
+				}
 			},
 
 			onCancelDialog: function () {
@@ -153,62 +167,63 @@ sap.ui.define(
 			},
 			
 			_processCSV: function (sCsvData) {
-			    const oModel = this.getView().getModel();
-			    const aLines = sCsvData.split(/\r\n|\n/);
-			    let iSuccessCount = 0;
-			
-			    // Use batch processing
-			    aLines.forEach((sLine, index) => {
-			        // Skip empty lines and the header row
-			        if (sLine.trim() === "" || index === 0) {
-			            return;
-			        }
-			
-			        const aValues = sLine.split(",");
-			        if (aValues.length === 5) {
-			            // Clean each value: trim whitespace and remove all quotes
-			            const aCleanValues = aValues.map((value) =>
-			                value.trim().replace(/"/g, "")
-			            );
-			
-			            const oNewPart = {
-			                Name: aCleanValues[0],
-			                Category: aCleanValues[1],
-			                Manufacturer: aCleanValues[2],
-			                Price: parseFloat(aCleanValues[3]),
-			                Stock: parseInt(aCleanValues[4], 10),
-			            };
-			
-			            // Check for valid data before adding to batch
-			            if (
-			                oNewPart.Name &&
-			                !isNaN(oNewPart.Price) &&
-			                !isNaN(oNewPart.Stock)
-			            ) {
-			                oModel.createEntry("/DroneParts", { properties: oNewPart });
-			                iSuccessCount++;
-			            }
-			        }
-			    });
-			
-			    if (iSuccessCount > 0) {
-			        oModel.submitChanges({
-			            success: () => {
-			                MessageToast.show(
-			                    `${iSuccessCount} parts imported successfully.`
-			                );
-			                oModel.refresh();
-			            },
-			            error: (oError) => {
-			                MessageBox.error(
-			                    "Error during import: " + JSON.stringify(oError)
-			                );
-			                oModel.resetChanges(); // Clear pending changes on error
-			            },
-			        });
-			    } else {
-			        MessageBox.warning("No valid data found in the CSV file to import.");
-			    }
+				const oModel = this.getView().getModel();
+				const aLines = sCsvData.split(/\r\n|\n/);
+				let iSuccessCount = 0;
+
+				// Use batch processing
+				aLines.forEach((sLine, index) => {
+					// Skip empty lines and the header row
+					if (sLine.trim() === "" || index === 0) {
+						return;
+					}
+
+					const aValues = sLine.split(",");
+					if (aValues.length === 5) {
+						// Clean each value: trim whitespace and remove all quotes
+						const aCleanValues = aValues.map((value) =>
+							value.trim().replace(/"/g, "")
+						);
+
+						const oNewPart = {
+							ID: this.generateUUID(), // Add UUID for each imported part
+							Name: aCleanValues[0],
+							Category: aCleanValues[1],
+							Manufacturer: aCleanValues[2],
+							Price: parseFloat(aCleanValues[3]),
+							Stock: parseInt(aCleanValues[4], 10),
+						};
+
+						// Check for valid data before adding to batch
+						if (
+							oNewPart.Name &&
+							!isNaN(oNewPart.Price) &&
+							!isNaN(oNewPart.Stock)
+						) {
+							oModel.createEntry("/DroneParts", { properties: oNewPart });
+							iSuccessCount++;
+						}
+					}
+				});
+
+				if (iSuccessCount > 0) {
+					oModel.submitChanges({
+						success: () => {
+							MessageToast.show(
+								`${iSuccessCount} parts imported successfully.`
+							);
+							oModel.refresh();
+						},
+						error: (oError) => {
+							MessageBox.error(
+								"Error during import: " + JSON.stringify(oError)
+							);
+							oModel.resetChanges(); // Clear pending changes on error
+						},
+					});
+				} else {
+					MessageBox.warning("No valid data found in the CSV file to import.");
+				}
 			},
 
 			onExportToCSV: function () {
@@ -220,7 +235,7 @@ sap.ui.define(
 				if (aItems.length === 0) {
 					return MessageToast.show("No data to export.");
 				}
-				const aHeaders = ["Name", "Category", "Manufacturer", "Price", "Stock"];
+				const aHeaders = ["ID", "Name", "Category", "Manufacturer", "Price", "Stock"];
 				let sCsvContent =
 					"data:text/csv;charset=utf-8," + aHeaders.join(",") + "\n";
 				aItems.forEach((oItem) => {
