@@ -59,14 +59,94 @@ sap.ui.define([
 			oBinding.filter(new Filter(aFilters, false));
 		},
 
+		_getDialog: function () {
+			if (!this._oDialog) {
+				this._oDialog = Fragment.load({
+					id: this.getView().getId(),
+					name: "app.app.view.fragment.AddEditDroneDialog",
+					controller: this,
+				}).then((oDialog) => {
+					this.getView().addDependent(oDialog);
+					return oDialog;
+				});
+			}
+			return this._oDialog;
+		},
+
 		onAdd: function () {
-			// Implementation will come with the dialog
-			MessageToast.show("Add functionality will be available soon!");
+			this.getView().getModel("editMode").setProperty("/isEdit", false);
+			this.getView().getModel("drone").setData({
+				Status: "In Progress" // Default status
+			});
+			this._getDialog().then((oDialog) => oDialog.open());
 		},
 
 		onEdit: function (oEvent) {
-			// Implementation will come with the dialog
-			MessageToast.show("Edit functionality will be available soon!");
+			const oContext = oEvent.getSource().getBindingContext();
+			this.getView().getModel("editMode").setProperty("/isEdit", true);
+			this.getView()
+				.getModel("drone")
+				.setData(Object.assign({}, oContext.getObject()));
+			this._sEditPath = oContext.getPath();
+			this._getDialog().then((oDialog) => {
+				oDialog.getBeginButton().setEnabled(true);
+				oDialog.open();
+			});
+		},
+
+		onDialogInputChange: function () {
+			const oDroneData = this.getView().getModel("drone").getData();
+			const bIsValid =
+				oDroneData.Model &&
+				oDroneData.SerialNumber &&
+				oDroneData.Status &&
+				oDroneData.Price > 0;
+			this.byId("dialogSaveButton").setEnabled(!!bIsValid);
+		},
+
+		onSaveDialog: function () {
+			const oModel = this.getView().getModel();
+			const oRawData = this.getView().getModel("drone").getData();
+			const bIsEdit = this.getView().getModel("editMode").getProperty("/isEdit");
+
+			// Create a clean payload
+			const oDroneData = {
+				Model: oRawData.Model,
+				SerialNumber: oRawData.SerialNumber,
+				Status: oRawData.Status,
+				Price: oRawData.Price,
+				Customer: oRawData.Customer || "",
+				Notes: oRawData.Notes || ""
+			};
+
+			// Add ID for new drones
+			if (!bIsEdit) {
+				oDroneData.ID = this.generateUUID();
+			}
+
+			const mParameters = {
+				success: () => {
+					MessageToast.show(bIsEdit ? "Drone updated." : "Drone created.");
+					this.onCancelDialog();
+				},
+				error: (oError) => {
+					const sMessage = oError?.responseText
+						? JSON.parse(oError.responseText)?.error?.message?.value
+						: "Unknown error";
+					MessageBox.error("Error: " + sMessage);
+				}
+			};
+
+			if (bIsEdit) {
+				oModel.update(this._sEditPath, oDroneData, mParameters);
+			} else {
+				console.log("CREATE drone payload:", JSON.stringify(oDroneData, null, 2));
+				oModel.create("/Drones", oDroneData, mParameters);
+			}
+		},
+
+		onCancelDialog: function () {
+			this._getDialog().then((oDialog) => oDialog.close());
 		},
 
 		onDelete: function (oEvent) {
@@ -92,20 +172,29 @@ sap.ui.define([
 				MessageToast.show("Please select drones to mark as exported.");
 				return;
 			}
-
+		
 			const oModel = this.getView().getModel();
 			let iProcessed = 0;
 			let iTotal = 0;
-
+		
 			aSelectedItems.forEach(oItem => {
 				const sPath = oItem.getBindingContext().getPath();
 				const oData = oItem.getBindingContext().getObject();
 				
 				if (oData.Status === "Ready") {
 					iTotal++;
-					oModel.update(sPath, {
-						Status: "Exported"
-					}, {
+					
+					// Send complete drone data with updated status
+					const oUpdatedDrone = {
+						Model: oData.Model,
+						SerialNumber: oData.SerialNumber,
+						Status: "Exported", // This is the only field we're changing
+						Price: oData.Price,
+						Customer: oData.Customer || "",
+						Notes: oData.Notes || ""
+					};
+					
+					oModel.update(sPath, oUpdatedDrone, {
 						success: () => {
 							iProcessed++;
 							if (iProcessed === iTotal) {
@@ -119,7 +208,7 @@ sap.ui.define([
 					});
 				}
 			});
-
+		
 			if (iTotal === 0) {
 				MessageToast.show("Only drones with 'Ready' status can be marked as exported.");
 			}
@@ -146,7 +235,7 @@ sap.ui.define([
 			oLink.setAttribute("download", "ExportedDrones.csv");
 			oLink.click();
 		},
-		
+
 		onNavigateToImportParts: function() {
 			this.getOwnerComponent().getRouter().navTo("ImportParts");
 		}
