@@ -32,10 +32,6 @@
 						<core:Item key="Exported" text="Exported" />
 					</items>
 				</Select>
-				<Label text="Assembly Date" />
-				<DatePicker value="{drone>/AssemblyDate}" />
-				<Label text="Export Date" />
-				<DatePicker value="{drone>/ExportDate}" />
 				<Label text="Price" required="true" />
 				<Input
 					value="{

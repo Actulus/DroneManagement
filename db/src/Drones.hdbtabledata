@@ -12,25 +12,24 @@
 		},
 		"import_settings": {
 			"import_columns": [
+				"ID",
 				"Model",
 				"SerialNumber",
 				"Status",
-				"AssemblyDate",
-				"ExportDate",
 				"Price",
 				"Customer",
 				"Notes"
-			]
+			],
+			"include_filter": []
 		},
 		"column_mappings": {
-			"Model": 1,
-			"SerialNumber": 2,
-			"Status": 3,
-			"AssemblyDate": 4,
-			"ExportDate": 5,
-			"Price": 6,
-			"Customer": 7,
-			"Notes": 8
+			"ID": 1,
+			"Model": 2,
+			"SerialNumber": 3,
+			"Status": 4,
+			"Price": 5,
+			"Customer": 6,
+			"Notes": 7
 		}
 	}]
 }

@@ -1,0 +1,14 @@
+namespace DroneManagement.db;
+
+entity Drones {
+    key ID           : String(36);  // UUID
+        Model        : String(100);
+        SerialNumber : String(50);
+        Status       : String(20); // "Ready", "In Progress", "Exported"
+        Price        : Decimal(10, 2);
+        Customer     : String(100);
+        Notes        : String(500);
+}
+technical configuration {
+    column store;
+};

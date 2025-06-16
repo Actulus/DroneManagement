@@ -13,7 +13,24 @@ sap.ui.define([
 		onInit: function () {
 			this.getView().setModel(new JSONModel({ isEdit: false }), "editMode");
 			this.getView().setModel(new JSONModel({}), "drone");
-			this.getView().setModel(new JSONModel({ selectedItems: [] }), "dronesTable");
+			this.getView().setModel(new JSONModel({ hasSelection: false }), "dronesTable");
+			
+			// Listen to table selection changes
+			this.byId("dronesTable").attachSelectionChange(this.onTableSelectionChange, this);
+		},
+
+		onTableSelectionChange: function(oEvent) {
+			const bHasSelection = oEvent.getSource().getSelectedItems().length > 0;
+			this.getView().getModel("dronesTable").setProperty("/hasSelection", bHasSelection);
+		},
+
+		// Generate UUID v4
+		generateUUID: function() {
+			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				var r = Math.random() * 16 | 0,
+					v = c == 'x' ? r : (r & 0x3 | 0x8);
+				return v.toString(16);
+			});
 		},
 
 		formatStatusState: function(sStatus) {
@@ -46,7 +63,9 @@ sap.ui.define([
 			this.getView().getModel("editMode").setProperty("/isEdit", false);
 			this.getView().getModel("drone").setData({
 				Status: "In Progress",
-				AssemblyDate: new Date()
+				Price: 0,
+				Customer: "",
+				Notes: ""
 			});
 			this._getDialog().then(oDialog => oDialog.open());
 		},
@@ -55,8 +74,6 @@ sap.ui.define([
 			const oContext = oEvent.getSource().getBindingContext();
 			this.getView().getModel("editMode").setProperty("/isEdit", true);
 			const oData = Object.assign({}, oContext.getObject());
-			if (oData.AssemblyDate) oData.AssemblyDate = new Date(oData.AssemblyDate);
-			if (oData.ExportDate) oData.ExportDate = new Date(oData.ExportDate);
 			this.getView().getModel("drone").setData(oData);
 			this._sEditPath = oContext.getPath();
 			this._getDialog().then(oDialog => {
@@ -90,28 +107,35 @@ sap.ui.define([
 			}
 
 			const oModel = this.getView().getModel();
-			const oCurrentDate = new Date();
 			let iProcessed = 0;
+			let iTotal = 0;
 
 			aSelectedItems.forEach(oItem => {
 				const sPath = oItem.getBindingContext().getPath();
 				const oData = oItem.getBindingContext().getObject();
 				
 				if (oData.Status === "Ready") {
+					iTotal++;
 					oModel.update(sPath, {
-						Status: "Exported",
-						ExportDate: oCurrentDate
+						Status: "Exported"
 					}, {
 						success: () => {
 							iProcessed++;
-							if (iProcessed === aSelectedItems.length) {
+							if (iProcessed === iTotal) {
 								MessageToast.show(`${iProcessed} drone(s) marked as exported.`);
 								oTable.removeSelections();
 							}
+						},
+						error: (oError) => {
+							MessageBox.error("Error marking drone as exported: " + JSON.stringify(oError));
 						}
 					});
 				}
 			});
+
+			if (iTotal === 0) {
+				MessageToast.show("Only drones with 'Ready' status can be marked as exported.");
+			}
 		},
 
 		onExportToCSV: function () {
@@ -123,7 +147,7 @@ sap.ui.define([
 				return MessageToast.show("No data to export.");
 			}
 			
-			const aHeaders = ["Model", "SerialNumber", "Status", "AssemblyDate", "ExportDate", "Price", "Customer", "Notes"];
+			const aHeaders = ["ID", "Model", "SerialNumber", "Status", "Price", "Customer", "Notes"];
 			let sCsvContent = "data:text/csv;charset=utf-8," + aHeaders.join(",") + "\n";
 			
 			aItems.forEach(oItem => {
@@ -153,7 +177,7 @@ sap.ui.define([
 		onDialogInputChange: function () {
 			const oDroneData = this.getView().getModel("drone").getData();
 			const bIsValid = oDroneData.Model && oDroneData.SerialNumber && 
-							oDroneData.Status && oDroneData.Price > 0;
+							oDroneData.Status && oDroneData.Price >= 0;
 			this.byId("dialogSaveButton").setEnabled(!!bIsValid);
 		},
 
@@ -166,12 +190,15 @@ sap.ui.define([
 				Model: oRawData.Model,
 				SerialNumber: oRawData.SerialNumber,
 				Status: oRawData.Status,
-				AssemblyDate: oRawData.AssemblyDate,
-				ExportDate: oRawData.ExportDate,
 				Price: oRawData.Price,
 				Customer: oRawData.Customer || "",
 				Notes: oRawData.Notes || ""
 			};
+
+			// Generate UUID for new drones
+			if (!bIsEdit) {
+				oNewDrone.ID = this.generateUUID();
+			}
 
 			const mParameters = {
 				success: () => {
@@ -188,6 +215,7 @@ sap.ui.define([
 			if (bIsEdit) {
 				oModel.update(this._sEditPath, oNewDrone, mParameters);
 			} else {
+				console.log("CREATE payload:", JSON.stringify(oNewDrone, null, 2));
 				oModel.create("/Drones", oNewDrone, mParameters);
 			}
 		},
