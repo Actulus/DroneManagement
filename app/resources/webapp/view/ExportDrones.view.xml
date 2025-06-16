@@ -2,12 +2,11 @@
 	controllerName="app.app.controller.ExportDrones"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:u="sap.ui.unified"
 	displayBlock="true"
 >
 	<Page title="Export Drones">
 		<content>
-			<Table id="dronesTable" items="{/Drones}">
+			<Table id="dronesTable" items="{/Drones}" mode="MultiSelect">
 				<headerToolbar>
 					<OverflowToolbar>
 						<SearchField
@@ -18,6 +17,13 @@
 						/>
 						<ToolbarSpacer />
 						<Button
+							text="Go to Import Parts"
+							icon="sap-icon://navigation-left-arrow"
+							type="Emphasized"
+							press="onNavigateToImportParts"
+							class="sapUiTinyMarginEnd"
+						/>
+						<Button
 							icon="sap-icon://add"
 							tooltip="Add Drone"
 							press="onAdd"
@@ -26,7 +32,7 @@
 							icon="sap-icon://shipping-status"
 							tooltip="Mark as Exported"
 							press="onMarkExported"
-							enabled="{= ${dronesTable>/selectedItems}.length > 0}"
+							enabled="{= ${dronesTable>/hasSelection}}"
 						/>
 						<Button
 							icon="sap-icon://download"
@@ -39,14 +45,12 @@
 					<Column><Text text="Model" /></Column>
 					<Column><Text text="Serial Number" /></Column>
 					<Column><Text text="Status" /></Column>
-					<Column><Text text="Assembly Date" /></Column>
-					<Column><Text text="Export Date" /></Column>
 					<Column hAlign="End"><Text text="Price" /></Column>
 					<Column><Text text="Customer" /></Column>
 					<Column hAlign="Center" width="8rem"><Text text="Actions" /></Column>
 				</columns>
 				<items>
-					<ColumnListItem vAlign="Middle" selected="{selected}">
+					<ColumnListItem vAlign="Middle">
 						<cells>
 							<Text text="{Model}" />
 							<Text text="{SerialNumber}" />
@@ -54,16 +58,6 @@
 								text="{Status}" 
 								state="{path: 'Status', formatter: '.formatStatusState'}"
 							/>
-							<Text text="{
-								path: 'AssemblyDate',
-								type: 'sap.ui.model.type.Date',
-								formatOptions: { style: 'medium' }
-							}" />
-							<Text text="{
-								path: 'ExportDate',
-								type: 'sap.ui.model.type.Date',
-								formatOptions: { style: 'medium' }
-							}" />
 							<ObjectNumber
 								number="{
 									path: 'Price',

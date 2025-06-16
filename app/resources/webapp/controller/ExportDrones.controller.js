@@ -60,26 +60,13 @@ sap.ui.define([
 		},
 
 		onAdd: function () {
-			this.getView().getModel("editMode").setProperty("/isEdit", false);
-			this.getView().getModel("drone").setData({
-				Status: "In Progress",
-				Price: 0,
-				Customer: "",
-				Notes: ""
-			});
-			this._getDialog().then(oDialog => oDialog.open());
+			// Implementation will come with the dialog
+			MessageToast.show("Add functionality will be available soon!");
 		},
 
 		onEdit: function (oEvent) {
-			const oContext = oEvent.getSource().getBindingContext();
-			this.getView().getModel("editMode").setProperty("/isEdit", true);
-			const oData = Object.assign({}, oContext.getObject());
-			this.getView().getModel("drone").setData(oData);
-			this._sEditPath = oContext.getPath();
-			this._getDialog().then(oDialog => {
-				oDialog.getBeginButton().setEnabled(true);
-				oDialog.open();
-			});
+			// Implementation will come with the dialog
+			MessageToast.show("Edit functionality will be available soon!");
 		},
 
 		onDelete: function (oEvent) {
@@ -159,69 +146,9 @@ sap.ui.define([
 			oLink.setAttribute("download", "ExportedDrones.csv");
 			oLink.click();
 		},
-
-		_getDialog: function () {
-			if (!this._oDialog) {
-				this._oDialog = Fragment.load({
-					id: this.getView().getId(),
-					name: "app.app.view.fragment.AddEditDroneDialog",
-					controller: this
-				}).then(oDialog => {
-					this.getView().addDependent(oDialog);
-					return oDialog;
-				});
-			}
-			return this._oDialog;
-		},
-
-		onDialogInputChange: function () {
-			const oDroneData = this.getView().getModel("drone").getData();
-			const bIsValid = oDroneData.Model && oDroneData.SerialNumber && 
-							oDroneData.Status && oDroneData.Price >= 0;
-			this.byId("dialogSaveButton").setEnabled(!!bIsValid);
-		},
-
-		onSaveDialog: function () {
-			const oModel = this.getView().getModel();
-			const oRawData = this.getView().getModel("drone").getData();
-			const bIsEdit = this.getView().getModel("editMode").getProperty("/isEdit");
-
-			const oNewDrone = {
-				Model: oRawData.Model,
-				SerialNumber: oRawData.SerialNumber,
-				Status: oRawData.Status,
-				Price: oRawData.Price,
-				Customer: oRawData.Customer || "",
-				Notes: oRawData.Notes || ""
-			};
-
-			// Generate UUID for new drones
-			if (!bIsEdit) {
-				oNewDrone.ID = this.generateUUID();
-			}
-
-			const mParameters = {
-				success: () => {
-					MessageToast.show(bIsEdit ? "Drone updated." : "Drone created.");
-					this.onCancelDialog();
-				},
-				error: (oError) => {
-					const sMessage = oError?.responseText ? 
-						JSON.parse(oError.responseText)?.error?.message?.value : "Unknown error";
-					MessageBox.error("Error: " + sMessage);
-				}
-			};
-
-			if (bIsEdit) {
-				oModel.update(this._sEditPath, oNewDrone, mParameters);
-			} else {
-				console.log("CREATE payload:", JSON.stringify(oNewDrone, null, 2));
-				oModel.create("/Drones", oNewDrone, mParameters);
-			}
-		},
-
-		onCancelDialog: function () {
-			this._getDialog().then(oDialog => oDialog.close());
+		
+		onNavigateToImportParts: function() {
+			this.getOwnerComponent().getRouter().navTo("ImportParts");
 		}
 	});
 });

@@ -1,36 +1,21 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
-	"sap/ui/model/json/JSONModel"
-], function (Controller, JSONModel) {
+	"sap/ui/core/mvc/Controller"
+], function (Controller) {
 	"use strict";
 
 	return Controller.extend("app.app.controller.App", {
-		onInit: function () {
-			// Set up navigation model
-			this.getView().setModel(new JSONModel({
-				selectedKey: "parts"
-			}), "nav");
-			
-			// Listen to route changes to update selected key
-			this.getRouter().attachRouteMatched(this.onRouteMatched, this);
-		},
-		
-		onRouteMatched: function(oEvent) {
-			const sRouteName = oEvent.getParameter("name");
-			const sSelectedKey = sRouteName === "ExportDrones" ? "drones" : "parts";
-			this.getView().getModel("nav").setProperty("/selectedKey", sSelectedKey);
+		onInit: function() {
+			console.log("App controller onInit called!");
 		},
 		
 		onNavigateToImportParts: function() {
-			this.getRouter().navTo("ImportParts");
+			console.log("Navigate to Import Parts clicked!");
+			this.getOwnerComponent().getRouter().navTo("ImportParts");
 		},
 		
 		onNavigateToExportDrones: function() {
-			this.getRouter().navTo("ExportDrones");
-		},
-		
-		getRouter: function() {
-			return this.getOwnerComponent().getRouter();
+			console.log("Navigate to Export Drones clicked!");
+			this.getOwnerComponent().getRouter().navTo("ExportDrones");
 		}
 	});
 });

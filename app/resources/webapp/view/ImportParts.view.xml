@@ -18,6 +18,13 @@
 						/>
 						<ToolbarSpacer />
 						<Button
+							text="Go to Export Drones"
+							icon="sap-icon://navigation-right-arrow"
+							type="Emphasized"
+							press="onNavigateToExportDrones"
+							class="sapUiTinyMarginEnd"
+						/>
+						<Button
 							icon="sap-icon://add"
 							tooltip="Add Part"
 							press="onAdd"
